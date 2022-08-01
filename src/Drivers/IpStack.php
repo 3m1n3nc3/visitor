@@ -127,12 +127,15 @@ class IpStack implements IpDataParser
         if ($this->info && $this->info['ip'] === $this->ip()) {
             return $this->info;
         }
-        $ipInfo = \Illuminate\Support\Facades\Http::get($this->url . $this->ip(), [
-            'access_key' => $this->config['ip_api_key'],
-        ]);
 
-        if ($ipInfo->status() === 200) {
-            $info = $ipInfo->json() ?? $info;
+        if ($this->config['ip_api_key']) {
+            $ipInfo = \Illuminate\Support\Facades\Http::get($this->url . $this->ip(), [
+                'access_key' => $this->config['ip_api_key'],
+            ]);
+    
+            if ($ipInfo->status() === 200) {
+                $info = $ipInfo->json() ?? $info;
+            }
         }
 
         $this->info = $info;
