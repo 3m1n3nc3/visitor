@@ -42,18 +42,18 @@ php artisan migrate
 
 ### How to use
 
-You can access to `visitor's information` using `$request->visitor()` in your controllers , and  you can access to the visitor's information using `visitor()` helper function any where.
+You can access to `visitor's information` using `$request->visitor()` in your controllers , and you can access to the visitor's information using `visitor()` helper function any where.
 
 We have the below methods to retrieve a visitor's information:
 
-- `device` : device's name
-- `platform` : platform's name
-- `browser` : browser's name
-- `languages` : language's name
-- `ip` : client's ip
-- `request` : the whole request inputs
-- `useragent` : the whole useragent
-- `isOnline` : determines if current (or given) user is online
+-   `device` : device's name
+-   `platform` : platform's name
+-   `browser` : browser's name
+-   `languages` : language's name
+-   `ip` : client's ip
+-   `request` : the whole request inputs
+-   `useragent` : the whole useragent
+-   `isOnline` : determines if current (or given) user is online
 
 ```php
 $request->visitor()->browser(); // firefox
@@ -68,8 +68,6 @@ You can create logs using the `visit` method like the below
 ```php
 visitor()->visit(); // create a visit log
 ```
-
-use `Shetabit\Visitor\Traits\Visitable` trait in your models, then you can save visit's log for your models like the below
 
 ```php
 // or you can save log like the below
@@ -91,6 +89,7 @@ You can count model visits like the below
 ```php
 $model->visitLogs()->count();
 ```
+
 unique users can be counted by their IP and by model.
 
 ```php
@@ -103,10 +102,22 @@ $model->visitLogs()->visitor()->count();
 
 use `Shetabit\Visitor\Traits\Visitor` in your `User` class, then you can run below codes
 
- ```php
+```php
 $user->visit(); // create a visit log
 $user->visit($model); // create a log which says, $user has visited $model
- ```
+```
+
+#### User Geodata
+
+You can also include user geodata when creating logs.
+This feature will be dissabled by default, to enable this feature you will need to get api keys from either
+[https://ipstack.com/](https://ipstack.com/) or [https://ipgeolocation.io](https://ipgeolocation.io), these are the two services implemented by our drivers, you can also use your own drivers (See comments in published config file for details).
+Once you have your api keys you can add it to the `ip_api_key` config field, this will enable geodata loggin.
+You can then retrieve IP info:
+
+```php
+$model->visitLogs[0]->ip_info
+```
 
 #### Retrieve and Determine Online users
 

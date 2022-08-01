@@ -4,6 +4,7 @@ namespace Shetabit\Visitor;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Shetabit\Visitor\Contracts\IpDataParser;
 use Shetabit\Visitor\Contracts\UserAgentParser;
 use Shetabit\Visitor\Exceptions\DriverNotFoundException;
 use Shetabit\Visitor\Models\Visit;
@@ -107,11 +108,14 @@ class Visitor implements UserAgentParser
     /**
      * Retrieve user's ip information.
      *
-     * @return string|null
+     * @return object|string|null
      */
-    public  function ipInfo() : ?string
+    public  function ipInfo($model = null) : object|string|null
     {
-        return $this->getIpDriver()->data();
+        if ($model) {
+            return $this->getIpDriver()->load($model);
+        }
+        return $this->getIpDriver()->fetch();
     }
 
     /**
@@ -245,7 +249,7 @@ class Visitor implements UserAgentParser
     {
         if(in_array($this->request->path(), $this->except)){
             return;
-        }  
+        }
 
         $data = $this->prepareLog();
 
@@ -312,7 +316,7 @@ class Visitor implements UserAgentParser
             'device' => $this->device(),
             'platform' => $this->platform(),
             'browser' => $this->browser(),
-            'ip_info' => $this->ipInfo(),
+            'ip_info' => $this->ipInfo()->json(),
             'ip' => $this->ip(),
             'visitor_id' => $this->getVisitor() ? $this->getVisitor()->id : null,
             'visitor_type' => $this->getVisitor() ? get_class($this->getVisitor()): null
@@ -360,7 +364,7 @@ class Visitor implements UserAgentParser
      */
     protected function getIpDriver()
     {
-        if (empty($this->ipDriver)) {
+        if (empty($this->config['drivers']['IpDriver'])) {
             throw new DriverNotFoundException('IP driver not selected or default driver does not exist.');
         }
 
@@ -376,7 +380,7 @@ class Visitor implements UserAgentParser
             throw new \Exception("Driver must be an instance of Contracts\IpDataParser.");
         }
 
-        return app($driverClass);
+        return app($driverClass, $this->config);
     }
     /**
      * Validate driver.

@@ -2,7 +2,7 @@
 
 namespace Shetabit\Visitor\Drivers;
 
-use UAParser\Parser;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Shetabit\Visitor\Contracts\IpDataParser;
 
@@ -18,7 +18,7 @@ class IpGeolocation implements IpDataParser
     /**
      * The IP info.
      *
-     * @var Request
+     * @var array
      */
     protected $info;
 
@@ -28,10 +28,10 @@ class IpGeolocation implements IpDataParser
      * @param Request $request
      *
      */
-    public function __construct(Request $request, $config)
+    public function __construct(Request $request)
     {
+        $this->config = config('visitor');
         $this->request = $request;
-        $this->config = $config;
         $this->url = "https://api.ipgeolocation.io/ipgeo";
     }
 
@@ -40,8 +40,62 @@ class IpGeolocation implements IpDataParser
      *
      * @return string
      */
-    public function data() : string {
-        return $this->fetch();
+    public function data() : array {
+        return $this->info;
+    }
+
+    /**
+     * Convert the proccessed geodata from the IP address to json.
+     *
+     * @return string
+     */
+    public function json() : string {
+        return collect($this->info)->__toString();
+    }
+
+    /**
+     * Get the continent from ip info.
+     *
+     * @return string
+     */
+    public function continent() : string {
+        return $this->info['continent_name'];
+    }
+
+    /**
+     * Get the country flag from ip info.
+     *
+     * @return string
+     */
+    public function flag() : string {
+        return $this->info['country_flag'];
+    }
+
+    /**
+     * Get the country from ip info.
+     *
+     * @return string
+     */
+    public function country() : string {
+        return $this->info['country_name'];
+    }
+
+    /**
+     * Get the state from ip info.
+     *
+     * @return string
+     */
+    public function state() : string {
+        return $this->info['state_prov'];
+    }
+
+    /**
+     * Get the state from ip info.
+     *
+     * @return string
+     */
+    public function city() : string {
+        return $this->info['city'];
     }
 
     protected function ip()
@@ -57,20 +111,42 @@ class IpGeolocation implements IpDataParser
      *
      * @return string
      */
-    public function fetch() : string 
+    public function fetch() : object
     {
         $info = [];
 
+        if ($this->info && $this->info['ip'] === $this->ip()) {
+            return $this->info;
+        }
         $ipInfo = \Illuminate\Support\Facades\Http::get($this->url, [
-            'apiKey' => $this->config['ip_api_key']
+            'apiKey' => $this->config['ip_api_key'],
             'ip' => $this->ip()
         ]);
-        
+
         if ($ipInfo->status() === 200) {
             $info = $ipInfo->json() ?? $info;
         }
 
         $this->info = $info;
+
+        return $this;
+    }
+
+    /**
+     * Retrieve geodata from the database.
+     *
+     * @return string
+     */
+    public function load($model) : object
+    {
+        if (is_string($model) && app($model) instanceof Model) {
+            $model = app($model);
+        } else {
+            throw new \Exception("Model must be an instance of Illuminate\Database\Eloquent\Model.");
+        }
+        $this->info = is_string($model->visitLogs->ip_info)
+            ? json_decode($model->visitLogs->ip_info, JSON_FORCE_OBJECT)
+            : $model->visitLogs->ip_info;
 
         return $this;
     }

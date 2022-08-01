@@ -18,13 +18,13 @@ return [
     'table_name' =>  'shetabit_visits',
 
     //API key for the selected IpDriver
-    'ip_api_key' =>  '6c7db04800af479892e8dc2f04d51488',
+    'ip_api_key' =>  env('VISITOR_IP_API_KEY'),
 
     /**
-     * This ip address will be used in development mode 
+     * This ip address will be used in development mode
      * so that you can still recieve real data responses
      */
-    'dev_ip' =>  '6c7db04800af479892e8dc2f04d51488',
+    'dev_ip' =>  env('VISITOR_DEV_IP'),
 
     /*
     |--------------------------------------------------------------------------
@@ -37,10 +37,17 @@ return [
     | here with the same name. You will have to implement
     | Shetabit\Visitor\Contracts\UserAgentParser in your driver.
     |
+    | Available IpDrivers include:
+    | \Shetabit\Visitor\Drivers\IpGeolocation::class
+    | \Shetabit\Visitor\Drivers\IpStack::class
+    | If you would like to use your own custom driver
+    | your driver would need to implement
+    | the Shetabit\Visitor\Contracts\IpDataParser interface
+    |
     */
     'drivers' => [
         'jenssegers' => \Shetabit\Visitor\Drivers\JenssegersAgent::class,
         'UAParser' => \Shetabit\Visitor\Drivers\UAParser::class,
-        'IpDriver' => \Shetabit\Visitor\Drivers\UAParser::class,
+        'IpDriver' => \Shetabit\Visitor\Drivers\IpGeolocation::class,
     ]
 ];

@@ -26,6 +26,7 @@ class CreateVisitsTable extends Migration
             $table->text('platform')->nullable();
             $table->text('browser')->nullable();
             $table->ipAddress('ip')->nullable();
+            $table->json('ip_info')->nullable();
             $table->nullableMorphs('visitable'); // object model
             $table->nullableMorphs('visitor'); // subject model
             $table->timestamps();
