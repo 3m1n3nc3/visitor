@@ -112,7 +112,7 @@ $user->visit($model); // create a log which says, $user has visited $model
 You can also include user geodata when creating logs.
 This feature will be dissabled by default, to enable this feature you will need to get api keys from either
 [https://ipstack.com/](https://ipstack.com/) or [https://ipgeolocation.io](https://ipgeolocation.io), these are the two services implemented by our drivers, you can also use your own drivers (See comments in published config file for details).
-Once you have your api keys you can add it to the `ip_api_key` config field, this will enable geodata loggin.
+Once you have your api keys you can add it to the `VISITOR_IP_API_KEY` variable on your .env file or the `ip_api_key` config field in the config file, this will enable geodata loggin.
 You can then retrieve IP info:
 
 ```php

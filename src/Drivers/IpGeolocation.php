@@ -98,6 +98,15 @@ class IpGeolocation implements IpDataParser
         return $this->info['city'];
     }
 
+    /**
+     * Get the zip from ip info.
+     *
+     * @return string
+     */
+    public function zip() : string {
+        return $this->info['zipcode'];
+    }
+
     protected function ip()
     {
         if (stripos($this->request->ip(), '127.0.0') !== false && env('APP_ENV') === 'local') {

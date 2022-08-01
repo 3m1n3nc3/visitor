@@ -104,7 +104,7 @@ class IpStack implements IpDataParser
      * @return string
      */
     public function zip() : string {
-        return $this->info['city'];
+        return $this->info['zip'];
     }
 
     protected function ip()
