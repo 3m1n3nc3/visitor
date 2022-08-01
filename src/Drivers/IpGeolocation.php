@@ -128,15 +128,18 @@ class IpGeolocation implements IpDataParser
             return $this->info;
         }
 
-        if ($this->config['ip_api_key']) {
-            $ipInfo = \Illuminate\Support\Facades\Http::get($this->url . $this->ip(), [
-                'access_key' => $this->config['ip_api_key'],
-            ]);
-    
-            if ($ipInfo->status() === 200) {
-                $info = $ipInfo->json() ?? $info;
+        try {
+            if ($this->config['ip_api_key']) {
+                $ipInfo = \Illuminate\Support\Facades\Http::get($this->url, [
+                    'apiKey' => $this->config['ip_api_key'],
+                    'ip' => $this->ip()
+                ]);
+
+                if ($ipInfo->status() === 200) {
+                    $info = $ipInfo->json() ?? $info;
+                }
             }
-        }
+        } catch (\Illuminate\Http\Client\ConnectionException $th) {}
 
         $this->info = $info;
 
