@@ -14,9 +14,17 @@ return [
     //except save request or route names
     'except' =>  ['login', 'register'],
 
-
     //name of the table which visit records should save in
     'table_name' =>  'shetabit_visits',
+
+    //API key for the selected IpDriver
+    'ip_api_key' =>  '6c7db04800af479892e8dc2f04d51488',
+
+    /**
+     * This ip address will be used in development mode 
+     * so that you can still recieve real data responses
+     */
+    'dev_ip' =>  '6c7db04800af479892e8dc2f04d51488',
 
     /*
     |--------------------------------------------------------------------------
@@ -33,5 +41,6 @@ return [
     'drivers' => [
         'jenssegers' => \Shetabit\Visitor\Drivers\JenssegersAgent::class,
         'UAParser' => \Shetabit\Visitor\Drivers\UAParser::class,
+        'IpDriver' => \Shetabit\Visitor\Drivers\UAParser::class,
     ]
 ];

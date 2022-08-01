@@ -105,6 +105,16 @@ class Visitor implements UserAgentParser
     }
 
     /**
+     * Retrieve user's ip information.
+     *
+     * @return string|null
+     */
+    public  function ipInfo() : ?string
+    {
+        return $this->getIpDriver()->data();
+    }
+
+    /**
      * Retrieve request's url
      *
      * @return string
@@ -302,6 +312,7 @@ class Visitor implements UserAgentParser
             'device' => $this->device(),
             'platform' => $this->platform(),
             'browser' => $this->browser(),
+            'ip_info' => $this->ipInfo(),
             'ip' => $this->ip(),
             'visitor_id' => $this->getVisitor() ? $this->getVisitor()->id : null,
             'visitor_type' => $this->getVisitor() ? get_class($this->getVisitor()): null
@@ -341,6 +352,33 @@ class Visitor implements UserAgentParser
     }
 
     /**
+     * Get new driver instance
+     *
+     * @return Driver
+     *
+     * @throws \Exception
+     */
+    protected function getIpDriver()
+    {
+        if (empty($this->ipDriver)) {
+            throw new DriverNotFoundException('IP driver not selected or default driver does not exist.');
+        }
+
+        $driverClass = $this->config['drivers']['IpDriver'];
+
+        if (empty($driverClass) || !class_exists($driverClass)) {
+            throw new DriverNotFoundException('IP driver not found in config file. Try updating the package.');
+        }
+
+        $reflect = new \ReflectionClass($driverClass);
+
+        if (!$reflect->implementsInterface(IpDataParser::class)) {
+            throw new \Exception("Driver must be an instance of Contracts\IpDataParser.");
+        }
+
+        return app($driverClass);
+    }
+    /**
      * Validate driver.
      *
      * @throws \Exception
@@ -360,7 +398,7 @@ class Visitor implements UserAgentParser
         $reflect = new \ReflectionClass($driverClass);
 
         if (!$reflect->implementsInterface(UserAgentParser::class)) {
-            throw new \Exception("Driver must be an instance of Contracts\Driver.");
+            throw new \Exception("Driver must be an instance of Contracts\UserAgentParser.");
         }
     }
 }
